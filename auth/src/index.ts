@@ -1,12 +1,19 @@
-import express from "express";
+import app from "./app";
 
-const app = express();
-app.use(express.json());
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-app.get("/api/users/currentuser", (req, res) => {
-  res.status(200).send("Auth service is healthy");
+const server = app.listen(PORT, () => {
+  console.log(`[auth] Listening on port ${PORT}`);
 });
 
-app.listen(3000, () => {
-  console.log("Auth service is running on port 3000");
-});
+// Graceful shutdown: allow in-flight requests to finish before exiting
+const shutdown = (signal: string) => {
+  console.log(`[auth] Received ${signal}. Shutting down gracefully…`);
+  server.close(() => {
+    console.log("[auth] HTTP server closed. Exiting.");
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
