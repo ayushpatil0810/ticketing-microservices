@@ -12,12 +12,15 @@ interface UserAttrs {
 // ─── Document interface (shape of a saved User document) ────────────────────
 
 interface UserDoc extends mongoose.Document {
+  /** Mongoose virtual alias for `_id`. */
+  id: string;
+
   username: string;
   email: string;
   passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   comparePassword(candidate: string): Promise<boolean>;
 }
 

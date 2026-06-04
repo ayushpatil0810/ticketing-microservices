@@ -25,6 +25,29 @@ spec:
                 secretKeyRef:
                   name: auth-secret
                   key: MONGO_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: JWT_SECRET
+            - name: NODE_ENV
+              value: production
+          # ─── Health probes ──────────────────────────────────────────────────
+          # The /health endpoint returns 200 once the HTTP server is up.
+          # Liveness: restart the pod if the server is completely unresponsive.
+          # Readiness: stop routing traffic during startup or graceful shutdown.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 
 ---
 

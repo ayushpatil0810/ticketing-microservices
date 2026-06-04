@@ -1,41 +1,41 @@
 # ─── Stage 1: Builder ───────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
-# Install bun for package management
-RUN npm install -g bun
-
 WORKDIR /app
 
-# Copy manifests first for better layer caching
-COPY package.json bun.lock ./
+# Copy dependency manifests
+COPY package*.json ./
 
-# Install ALL dependencies (including devDependencies needed for tsc)
-RUN bun install --frozen-lockfile
+# Install all dependencies (including devDependencies)
+RUN npm ci
 
-# Copy source and compile TypeScript → dist/
+# Copy source files
 COPY tsconfig.json ./
 COPY src ./src
-RUN bunx tsc
+
+# Build TypeScript
+RUN npm run build
 
 # ─── Stage 2: Runner ────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
 
 ENV NODE_ENV=production
+
 WORKDIR /app
 
-# Install bun for package management
-RUN npm install -g bun
+# Copy dependency manifests
+COPY package*.json ./
 
-# Copy manifests and install production dependencies only
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+# Install production dependencies only
+RUN npm ci --omit=dev
 
-# Copy compiled output from builder stage
+# Copy build output
 COPY --from=builder /app/dist ./dist
 
-# Non-root user for security
+# Run as non-root user
 USER node
 
 EXPOSE 3000
 
+# Start application
 CMD ["node", "dist/index.js"]

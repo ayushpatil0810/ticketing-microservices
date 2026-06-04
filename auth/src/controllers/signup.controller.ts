@@ -4,6 +4,7 @@ import { apiResponse } from "../utils/response.js";
 import { RequestError } from "../utils/app-error.js";
 import asyncHandler from "../utils/async-handler.js";
 import { User } from "../models/user.js";
+import jsonwebtoken from "jsonwebtoken";
 
 /**
  * POST /api/auth/signup
@@ -35,6 +36,25 @@ export const signup = asyncHandler(
     const user = User.build({ username, email, password });
     await user.save();
 
-    apiResponse(res, true, "Account created successfully", user.toJSON(), 201);
+    const token = jsonwebtoken.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" },
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 3600000, // 1 hour
+    });
+
+    apiResponse(
+      res,
+      true,
+      "Account created successfully",
+      { ...user.toJSON(), token },
+      201,
+    );
   },
 );

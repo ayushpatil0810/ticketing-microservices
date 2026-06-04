@@ -11,6 +11,10 @@ const start = async (): Promise<void> => {
       throw new Error("MONGO_URI environment variable must be defined");
     }
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET environment variable must be defined");
+    }
+
     await mongoose.connect(process.env.MONGO_URI);
     console.log("[auth] Connected to MongoDB");
 
@@ -49,5 +53,9 @@ const shutdown = async (signal: string): Promise<void> => {
   }
 };
 
-process.on("SIGTERM", () => { void shutdown("SIGTERM"); });
-process.on("SIGINT",  () => { void shutdown("SIGINT");  });
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
+});
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
