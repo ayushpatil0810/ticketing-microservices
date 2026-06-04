@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppError, RequestError } from "../utils/app-error";
+import { AppError, RequestError } from "../utils/app-error.js";
 
 /**
  * Central Express error-handling middleware.
@@ -7,7 +7,7 @@ import { AppError, RequestError } from "../utils/app-error";
  * Convention: any controller/middleware should either call next(err) or
  * throw inside an asyncHandler wrapper — never call res.json() for errors.
  *
- * Shape returned to the client:
+ * Response shape:
  *   { success: false, message: string, errors?: unknown }
  */
 export const errorHandler = (
@@ -33,8 +33,7 @@ export const errorHandler = (
     return;
   }
 
-  // Unexpected Errors, logged for debugging, but not exposed to clients
-
+  // ── Unexpected / programmer errors — log but don't leak internals ────────
   console.error("[Unhandled Error]", err);
 
   res.status(500).json({

@@ -1,22 +1,26 @@
 {
   "name": "auth",
-  "module": "index.ts",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "Auth microservice for the ticketing application",
+  "main": "dist/index.js",
+  "type": "commonjs",
   "private": true,
   "scripts": {
-    "start": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.6",
-    "tsx": "^4.22.4"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@types/node": "^22.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^5.2.1",
     "mongoose": "^9.6.3",
-    "zod": "^4.4.3"
+    "zod": "^3.24.0"
   }
 }
